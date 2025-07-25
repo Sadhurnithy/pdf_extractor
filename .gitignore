@@ -1,0 +1,42 @@
+# Python virtual environment
+# Never commit your virtual environment directory
+.venv/
+venv/
+env/
+ENV/
+
+# Python artifacts
+# Compiled Python files and caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.egg-info/
+dist/
+build/
+
+# Project-specific output directory
+# The application generates its results here, which should not be versioned
+output/
+
+# IDE and editor configuration files
+# User-specific settings for IDEs like VS Code, PyCharm, etc.
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Operating System generated files
+# Annoying files created by macOS and Windows
+.DS_Store
+Thumbs.db
+
+# Logs and databases
+# Any log files or local databases created during testing
+*.log
+*.db
+*.sqlite3
+
+# Environment variables
+# Never commit environment files, which may contain secrets
+.env
