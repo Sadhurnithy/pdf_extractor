@@ -4,7 +4,6 @@ import os
 import re
 from collections import defaultdict
 
-# Regex to detect common heading patterns (e.g., "1.2", "A.", "Chapter 3")
 HEADING_REGEX = re.compile(r"^\s*((\d{1,3}(\.\d{1,3})*\.?)|([A-Z]\.)|([a-z]\))|((Chapter|Section)\s+\d{1,3}(\.\d{1,3})*))\s+")
 
 def analyze_document_styles(doc):
@@ -16,7 +15,7 @@ def analyze_document_styles(doc):
     for page in doc:
         blocks = page.get_text("dict")["blocks"]
         for b in blocks:
-            if b['type'] == 0 and "lines" in b:  # block['type'] == 0 is a text block
+            if b['type'] == 0 and "lines" in b:
                 for l in b["lines"]:
                     for s in l["spans"]:
                         text = s["text"].strip()
@@ -69,9 +68,6 @@ def extract_outline(doc, style_map, title_style, body_style):
     outline = []
     title = "Untitled Document"
     
-    ## RECTIFIED: Title extraction logic is now robust.
-    # It uses a flag to stop searching once the first valid title is found,
-    # preventing it from being overwritten. It also correctly joins multi-span titles.
     title_found = False
     if title_style:
         for page in doc.pages(stop=min(3, doc.page_count)):
@@ -94,10 +90,6 @@ def extract_outline(doc, style_map, title_style, body_style):
         for b in blocks:
             if b['type'] == 0 and "lines" in b:
                 for l in b["lines"]:
-                    ## RECTIFIED: Heading detection is now more robust.
-                    # Instead of assuming a heading is a single span (`len(spans) == 1`),
-                    # it now joins all spans in a line and uses the dominant style.
-                    # This correctly handles headings with mixed formatting (e.g., bold numbers).
                     if not l['spans']:
                         continue
                     
@@ -112,14 +104,12 @@ def extract_outline(doc, style_map, title_style, body_style):
                     if style in style_map:
                         level = style_map[style]
                     elif HEADING_REGEX.match(line_text) and style != body_style:
-                        level = "H3" # Default for regex-matched headings
+                        level = "H3"
 
                     if level:
                         clean_text = HEADING_REGEX.sub('', line_text).strip()
                         outline.append({"level": level, "text": clean_text, "page": page_num})
                             
-    ## RECTIFIED: The final outline is explicitly sorted by page number.
-    # This ensures the output is always in the correct reading order.
     outline.sort(key=lambda x: x['page'])
     return {"title": title, "outline": outline}
 
