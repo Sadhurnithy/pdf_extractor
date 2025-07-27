@@ -5,6 +5,16 @@
 A high-performance, ML-powered system that extracts structured outlines (Title, H1, H2, H3) from PDF documents and outputs a clean, hierarchical JSON file. Built to run fully offline in a Dockerized environment while complying with strict performance and resource constraints.
 
 ---
+## 📌 Table of Contents
+- [Overview](#overview)
+- [Architecture: ML-Powered Pipeline](#%EF%B8%8F-architecture-ml-powered-pipeline)
+- [Models & Libraries Used](#-models--libraries-used)
+- [Build & Run Instructions](#-build--run-instructions)
+- [Local Testing Guide](#-local-testing-guide)
+- [Bonus: Multilingual Support](#-bonus-multilingual-support)
+- [Acknowledgements](#-acknowledgements)
+
+---
 
 ## 🔍 Overview
 
