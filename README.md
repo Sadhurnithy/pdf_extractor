@@ -6,18 +6,6 @@ A high-performance, ML-powered system that extracts structured outlines (Title, 
 
 ---
 
-## 📌 Table of Contents
-- [Overview](#overview)
-- [Architecture: ML-Powered Pipeline](#architecture-ml-powered-pipeline)
-- [Models & Libraries Used](#models--libraries-used)
-- [Build & Run Instructions](#build--run-instructions)
-- [Local Testing Guide](#local-testing-guide)
-- [Performance Compliance](#performance-compliance)
-- [Bonus: Multilingual Support](#bonus-multilingual-support)
-- [Acknowledgements](#acknowledgements)
-
----
-
 ## 🔍 Overview
 
 This project intelligently parses PDF documents and extracts their logical structure using machine learning, rather than relying solely on font heuristics. It is built with:
