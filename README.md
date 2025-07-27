@@ -1,38 +1,113 @@
-# PDF Outline Extractor
+# Pdf Extractor
 
-This project is a fully containerized, offline application that extracts a structured outline (Title, H1, H2, H3 headings) from PDF documents. It is designed as an automated backend tool that reads PDFs from a specified input directory and writes structured JSON files to an output directory, adhering to strict performance and resource constraints.
+**🏆 Adobe "Connecting the Dots" Hackathon (Round 1A) Submission**
 
-## My Approach
+A high-performance, ML-powered system that extracts structured outlines (Title, H1, H2, H3) from PDF documents and outputs a clean, hierarchical JSON file. Built to run fully offline in a Dockerized environment while complying with strict performance and resource constraints.
 
-The solution is built around a **dynamic heuristic engine** rather than a large, pre-trained machine learning model. This design ensures full compliance with the competition's size and performance constraints while maintaining high accuracy on a wide range of documents. The logic is entirely self-contained and does not hardcode any file-specific rules, adapting to each PDF individually.
+---
 
-The process for each PDF is as follows:
+## 📌 Table of Contents
+- [Overview](#overview)
+- [Architecture: ML-Powered Pipeline](#architecture-ml-powered-pipeline)
+- [Models & Libraries Used](#models--libraries-used)
+- [Build & Run Instructions](#build--run-instructions)
+- [Local Testing Guide](#local-testing-guide)
+- [Performance Compliance](#performance-compliance)
+- [Bonus: Multilingual Support](#bonus-multilingual-support)
+- [Acknowledgements](#acknowledgements)
 
-1.  **Dynamic Style Analysis**: The application first performs a complete pass over the PDF to profile its unique typographic styles (font size, font name, and weight). It counts the frequency of each style to understand the document's inherent structure.
+---
 
-2.  **Hierarchy Inference**: The engine assumes the most frequently used style is the main body text. It then identifies potential headings by finding styles that are either larger than the body text or have a bold font weight. These candidates are sorted by size to dynamically map them to semantic levels: the largest style becomes the `Title`, the next largest `H1`, then `H2`, and so on.
+## 🔍 Overview
 
-3.  **Hybrid Content Extraction**: With the style map established, the application performs a second pass to extract content. A line of text is identified as a heading if it meets one of two criteria:
-    *   It matches one of the identified heading styles from the previous step.
-    *   It matches a pre-defined regular expression for common heading patterns (e.g., `1.1. Introduction`, `A. Background`) and is not styled as body text. This hybrid approach allows the tool to correctly identify headings even in documents with less consistent styling.
+This project intelligently parses PDF documents and extracts their logical structure using machine learning, rather than relying solely on font heuristics. It is built with:
 
-## Models or Libraries Used
+- A lightweight LightGBM classification model.
+- Fast PDF parsing via PyMuPDF.
+- Offline compatibility with no internet access.
+- A Docker container for seamless deployment and testing.
 
-No machine learning models are used in this project. The entire solution is algorithmic.
+---
 
--   **PyMuPDF (fitz)**: This is the sole library dependency. It is a high-performance Python library for PDF parsing, chosen for its exceptional speed and its ability to extract rich metadata about text, including the font size, name, and weight, which are crucial inputs for the heuristic engine.
+## ⚙️ Architecture: ML-Powered Pipeline
 
-## How to Build and Run Your Solution
+The system is implemented as a **three-stage pipeline**:
 
-The application is designed to be built and run using Docker, as specified in the hackathon requirements.
+### 🔹 Stage 1: High-Speed PDF Parsing & Feature Engineering
+Uses `PyMuPDF (Fitz)` to extract structured features for each text block:
+- **Font Features**: Size, family, bold/italic flags.
+- **Positional Features**: X-position (for center alignment), whitespace above/below.
+- **Statistical Features**: Font size relative to page median.
+- **Content Features**: Word count, ALL CAPS flag, numbered list pattern detection.
 
-### Prerequisites
+### 🔹 Stage 2: Heading Classification via LightGBM
+- Lightweight, CPU-efficient LightGBM model classifies blocks as:
+  `Title`, `H1`, `H2`, `H3`, or `Body`.
 
--   Docker must be installed and running on your system.
+### 🔹 Stage 3: Hierarchical Assembly & JSON Output
+- Body blocks are discarded.
+- Remaining headings are sorted and hierarchically assembled.
+- Output saved as a clean, nested JSON.
 
-### Build the Docker Image
+---
 
-Navigate to the project's root directory (where the `Dockerfile` is located) and execute the following command. This will build the Docker image and tag it as `pdf-extractor`.
+## 📚 Models & Libraries Used
+
+### Machine Learning
+- `LightGBM`: Pre-trained classifier for heading detection (`lgbm_header_classifier.txt` < 5MB).
+
+### Core Libraries
+- `PyMuPDF`: Ultra-fast PDF parsing and text block metadata extraction.
+- `scikit-learn`: Feature preprocessing.
+
+---
+
+## 🐳 Build & Run Instructions
+
+### 1. Build Docker Image
+```bash
+docker build --platform linux/amd64 -t pdf_extractor:latest .
+```
+### 2. Run the Docker Container
+```bash
+docker run --rm -v $(pwd)/input:/app/input -v $(pwd)/output:/app/output --network none pdf_extractor:latest
+```
+- Place your .pdf files inside input/
+- The container will generate corresponding .json files in output/
+
+## 🧪 Local Testing Guide
+### 1. Clone the Repo
 
 ```bash
-docker build --platform linux/amd64 -t pdf-extractor:latest .
+git clone [your-repo-url]
+cd [project-directory]
+```
+### 2. Create Input/Output Folders
+
+```bash
+mkdir input output
+```
+### 3. Add PDF for Testing
+- Place sample.pdf inside the input/ directory.
+
+### 4. Build Image
+```bash
+docker build --platform linux/amd64 -t pdf_extractor:latest .
+```
+### 5. Run Container
+
+```bash
+docker run --rm -v $(pwd)/input:/app/input -v $(pwd)/output:/app/output --network none pdf_extractor:latest
+```
+### 6. Check Result
+- See output/sample.json for the extracted outline.
+
+---
+
+## 🌍 Bonus: Multilingual Support
+This system generalizes across multiple languages and scripts (including non-Latin, such as Japanese) because it relies on structural and layout-based features rather than language-dependent NLP.
+
+---
+
+## 🙏 Acknowledgements
+This project was built as part of Adobe's "Connecting the Dots" Challenge (Round 1A).
